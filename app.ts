@@ -1,12 +1,16 @@
+import dotenv from 'dotenv'
 import express from 'express';
+import dbConnection from './config/db';
+import categoriesRoute from './routes/categoriesRoute';
+const app:express.Application = express();
+app.use(express.json())
+dotenv.config()
+const PORT = process.env.PORT || 3000;
 
-const app: express.Application = express();
+dbConnection();
 
-app.get('', function(req:express.Request, res: express.Response){
-    res.send("Hello World")
-})
+app.use('/api/v1/categories', categoriesRoute);
 
-
-app.listen(3000, ()=>{
-    console.log(`App Is Run on Port 3000`);
-})
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
