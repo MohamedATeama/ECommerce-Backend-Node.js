@@ -7,4 +7,9 @@ const subCategoriesSchema: Schema = new Schema({
   category: { type: Schema.Types.ObjectId, ref: "categories" }
 }, {timestamps: true});
 
+subCategoriesSchema.pre<SubCategories>(/^find/, function(next) {
+  this.populate({ path: "category", select: "name" });
+  next();
+})
+
 export default model<SubCategories>("subCategories", subCategoriesSchema);
