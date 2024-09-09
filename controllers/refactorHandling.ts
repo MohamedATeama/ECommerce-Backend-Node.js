@@ -5,15 +5,25 @@ import { Request } from 'express';
 import { Response } from 'express';
 import { NextFunction } from 'express';
 import ApiError from '../utils/apiError';
+import Features from '../utils/features';
 
 export const getAll = <modelType> (model: Model<any>, modelName: string) =>
   expressAsyncHandler(async (req:Request, res:Response, next: NextFunction) => {
     let filterData: any = {};
+    let searchLength: number = 0;
     if (req.filterData) {
       filterData = req.filterData;
     }
-    const data: modelType[] = await model.find(filterData);
-    res.status(200).json({ data: data });
+    if (req.query) {
+      const searchResult: Features = new Features(model.find(filterData), req.query).filter().search(modelName)
+      const searchData: modelType[] = await searchResult.mongooseQuery;
+      searchLength = searchData.length;
+    }
+    const documentsCount: number = searchLength || await model.find(filterData).countDocuments();
+    const feature: Features = new Features(model.find(filterData), req.query).filter().sort().limitFields().search(modelName).pagination(documentsCount);
+    const { mongooseQuery, paginationResult } = feature;
+    const data: modelType[] = await mongooseQuery;
+    res.status(200).json({ length: data.length, pagination: paginationResult, data: data });
   });
 
 export const createOne = <modelType>(model: Model<any>) =>
