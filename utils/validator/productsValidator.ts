@@ -61,18 +61,18 @@ export const createProductValidator: RequestHandler[] = [
       }
       return true;
     }),
-  check("subcategory")
+  check("subCategory")
     .notEmpty()
-    .withMessage("subcategory required")
+    .withMessage("subCategory required")
     .isMongoId()
-    .withMessage("invalid subcategory id")
+    .withMessage("invalid subCategory id")
     .custom(async (val: string, { req }) => {
-      const subcategory = await subCategoriesModel.findById(val);
-      if (!subcategory) {
-        throw new Error("subcategory not found");
+      const subCategory = await subCategoriesModel.findById(val);
+      if (!subCategory) {
+        throw new Error("subCategory not found");
       }
-      if (subcategory.category._id!.toString() !== req.body.category) {
-        throw new Error("subcategory not exist in this category");
+      if (subCategory.category._id!.toString() !== req.body.category) {
+        throw new Error("subCategory not exist in this category");
       }
       return true;
     }),
@@ -138,17 +138,17 @@ export const updateProductValidator: RequestHandler[] = [
       }
       return true;
     }),
-  check("subcategory")
+  check("subCategory")
     .optional()
     .isMongoId()
-    .withMessage("invalid subcategory id")
+    .withMessage("invalid subCategory id")
     .custom(async (val: string, { req }) => {
-      const subcategory = await subCategoriesModel.findById(val);
-      if (!subcategory) {
-        throw new Error("subcategory not found");
+      const subCategory = await subCategoriesModel.findById(val);
+      if (!subCategory) {
+        throw new Error("subCategory not found");
       }
-      if (subcategory.category._id!.toString() !== req.body.category) {
-        throw new Error("subcategory not exist in this category");
+      if (subCategory.category._id!.toString() !== req.body.category) {
+        throw new Error("subCategory not exist in this category");
       }
       return true;
     }),

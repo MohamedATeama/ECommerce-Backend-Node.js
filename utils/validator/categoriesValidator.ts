@@ -2,6 +2,10 @@ import { RequestHandler } from "express";
 import { check } from "express-validator";
 import validatorMiddleware from "../../middlewares/validatorMiddleware";
 import categoriesModel from "../../models/categoriesModel";
+import subCategoriesModel from "../../models/subCategoriesModel";
+import { SubCategories } from "../../interfaces/subCategoriesInterface";
+import { Products } from "../../interfaces/productsInterface";
+import productsModel from "../../models/productsModel";
 
 export const createCategoryValidator: RequestHandler[] = [
   check('name')
@@ -32,7 +36,17 @@ export const updateCategoryValidator: RequestHandler[] = [
 ]
 
 export const deleteCategoryValidator: RequestHandler[] = [
-  check('id')
-  .isMongoId().withMessage('Invalid id'),
-  validatorMiddleware
-]
+  check("id")
+    .isMongoId()
+    .withMessage("Invalid id")
+    .custom(async (val: string) => {
+      const subCategory = await subCategoriesModel.find({ category: val });
+      if (subCategory.length > 0) {
+        const bulkOption = subCategory.map((subCategory: SubCategories) => ({
+          deleteOne: { filter: { _id: subCategory._id } },
+        }));
+        await subCategoriesModel.bulkWrite(bulkOption);
+      }
+    }),
+  validatorMiddleware,
+];

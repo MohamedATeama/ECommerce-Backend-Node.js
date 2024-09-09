@@ -14,7 +14,7 @@ const productsSchema: Schema = new Schema<Products>(
     cover: String,
     images: [String],
     category: { type: Schema.Types.ObjectId, ref: "categories" },
-    subCategory: { type: Schema.Types.ObjectId, ref: "subcategories" },
+    subCategory: { type: Schema.Types.ObjectId, ref: "subCategories" },
   },
   { timestamps: true }
 );
