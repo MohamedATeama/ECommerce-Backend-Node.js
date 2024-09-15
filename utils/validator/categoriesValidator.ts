@@ -40,6 +40,15 @@ export const deleteCategoryValidator: RequestHandler[] = [
     .isMongoId()
     .withMessage("Invalid id")
     .custom(async (val: string) => {
+      const products = await productsModel.find({ category: val });
+      if (products.length > 0) {
+        const bulkOption = products.map((product: Products) => ({
+          deleteOne: { filter: { _id: product._id } }
+        }))
+        await productsModel.bulkWrite(bulkOption)
+      }
+    })
+    .custom(async (val: string) => {
       const subCategory = await subCategoriesModel.find({ category: val });
       if (subCategory.length > 0) {
         const bulkOption = subCategory.map((subCategory: SubCategories) => ({
