@@ -2,6 +2,7 @@ import { RequestHandler } from "express";
 import { check } from "express-validator";
 import validatorMiddleware from "../../middlewares/validatorMiddleware";
 import usersModel from "../../models/usersModel";
+import bcrypt from 'bcryptjs';
 
 export const createUserValidator: RequestHandler[] = [
   check("name")
@@ -38,6 +39,12 @@ export const createUserValidator: RequestHandler[] = [
     .isLength({ min: 6, max: 20 })
     .withMessage("password length from 6 to 20 char"),
   check("phone").optional().isMobilePhone(["ar-EG"]),
+  check("role")
+    .optional()
+    .custom((val: string, { req }) => {
+      req.body.role = "admin";
+      return true;
+    }),
   validatorMiddleware,
 ];
 
@@ -86,5 +93,50 @@ export const changeUserPasswordValidator: RequestHandler[] = [
 
 export const deleteUserValidator: RequestHandler[] = [
   check("id").isMongoId().withMessage("invalid mongo id"),
+  validatorMiddleware,
+];
+
+export const changeLoggedUserPasswordValidator: RequestHandler[] = [
+  check("currentPassword")
+    .notEmpty()
+    .withMessage("current password is required")
+    .isLength({ min: 6, max: 20 })
+    .withMessage("password length from 6 to 20 char")
+    .custom( async (val: string, { req }) => {
+      const user = await usersModel.findById(req.user._id);
+      const validPassword = await bcrypt.compare(val, user!.password);
+      if (!validPassword) {
+        throw new Error("current password doesn't match");
+      }
+      return true;
+    }),
+  check("password")
+    .notEmpty()
+    .withMessage("password is required")
+    .isLength({ min: 6, max: 20 })
+    .withMessage("password length from 6 to 20 char")
+    .custom((val: string, { req }) => {
+      if (val !== req.body.confirmPassword) {
+        throw new Error("password doesn't match");
+      }
+      return true;
+    }),
+  check("confirmPassword")
+    .notEmpty()
+    .withMessage("password is required")
+    .isLength({ min: 6, max: 20 })
+    .withMessage("password length from 6 to 20 char"),
+  validatorMiddleware,
+];
+
+export const updateLoggedUserValidator: RequestHandler[] = [
+  check("name")
+    .optional()
+    .isLength({ min: 2, max: 50 })
+    .withMessage("name length must be between 2 & 50"),
+  check("phone")
+    .optional()
+    .isMobilePhone(["ar-EG"])
+    .withMessage("invalid Egyptian number"),
   validatorMiddleware,
 ];

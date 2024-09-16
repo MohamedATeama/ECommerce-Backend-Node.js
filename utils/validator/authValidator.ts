@@ -38,6 +38,12 @@ export const signupValidator: RequestHandler[] = [
     .isLength({ min: 6, max: 20 })
     .withMessage("password length from 6 to 20 char"),
   check("phone").optional().isMobilePhone(["ar-EG"]),
+  check("role")
+    .optional()
+    .custom((val: string, { req }) => {
+      req.body.role = "user";
+      return true;
+    }),
   validatorMiddleware,
 ];
 
@@ -48,6 +54,35 @@ export const loginValidator: RequestHandler[] = [
     .isEmail()
     .withMessage("Invalid Email"),
   check("password")
+    .notEmpty()
+    .withMessage("password is required")
+    .isLength({ min: 6, max: 20 })
+    .withMessage("password length from 6 to 20 char"),
+  validatorMiddleware,
+];
+
+export const forgetPasswordValidator: RequestHandler[] = [
+  check("email")
+    .notEmpty()
+    .withMessage("Email is Required")
+    .isEmail()
+    .withMessage("Invalid Email"),
+  validatorMiddleware,
+];
+
+export const resetPasswordValidator: RequestHandler[] = [
+  check("password")
+    .notEmpty()
+    .withMessage("password is required")
+    .isLength({ min: 6, max: 20 })
+    .withMessage("password length from 6 to 20 char")
+    .custom((val: string, { req }) => {
+      if (val !== req.body.confirmPassword) {
+        throw new Error("password doesn't match");
+      }
+      return true;
+    }),
+  check("confirmPassword")
     .notEmpty()
     .withMessage("password is required")
     .isLength({ min: 6, max: 20 })
