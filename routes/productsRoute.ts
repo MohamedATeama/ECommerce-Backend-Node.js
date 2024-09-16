@@ -9,12 +9,17 @@ import {
   resizeProductImages,
 } from "../controllers/productsControllers";
 import { createProductValidator, getProductValidator, updateProductValidator, deleteProductValidator } from "../utils/validator/productsValidator";
+import {
+  protectRoutes,
+  checkActive,
+  allowedTo,
+} from "./../controllers/authController";
 
 const productsRoute: Router = Router();
 productsRoute
   .route("/")
   .get(getAllProducts)
-  .post(
+  .post(protectRoutes, checkActive, allowedTo('manager', 'admin'), 
     uploadProductImages,
     resizeProductImages,
     createProductValidator,
@@ -24,7 +29,7 @@ productsRoute
 productsRoute
   .route("/:id")
   .get(getProductValidator, getProduct)
-  .put(updateProductValidator, updateProduct)
-  .delete(deleteProductValidator, deleteProduct);
+  .put(protectRoutes, checkActive, allowedTo('manager', 'admin'), updateProductValidator, updateProduct)
+  .delete(protectRoutes, checkActive, allowedTo('manager', 'admin'), deleteProductValidator, deleteProduct);
 
 export default productsRoute;
