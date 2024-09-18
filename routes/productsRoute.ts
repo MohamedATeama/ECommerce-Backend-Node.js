@@ -14,8 +14,13 @@ import {
   checkActive,
   allowedTo,
 } from "./../controllers/authController";
+import reviewsRoute from "./reviewsRoute";
 
 const productsRoute: Router = Router();
+
+productsRoute.use("/:productId/reviews", reviewsRoute);
+
+
 productsRoute
   .route("/")
   .get(getAllProducts)

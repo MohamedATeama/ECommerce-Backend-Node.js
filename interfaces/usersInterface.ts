@@ -1,4 +1,5 @@
 import { Document } from "mongoose";
+import { Products } from "./productsInterface";
 
 export interface Users extends Document {
   _id: string;
@@ -9,6 +10,8 @@ export interface Users extends Document {
   role: UserRole;
   active: boolean;
   image: string;
+  wishlist: Products[];
+  address: UserAddress[];
   passwordChangedAt: Date | number;
   resetCode: string | undefined;
   resetCodeExpireTime: Date | number | undefined;
@@ -16,3 +19,10 @@ export interface Users extends Document {
 }
 
 type UserRole = 'manager' | 'admin' | 'user';
+
+type UserAddress = {
+  street: string;
+  city: string;
+  state: string;
+  postalCode: string;
+};
