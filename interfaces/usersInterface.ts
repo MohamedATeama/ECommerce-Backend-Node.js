@@ -20,7 +20,7 @@ export interface Users extends Document {
 
 type UserRole = 'manager' | 'admin' | 'user';
 
-type UserAddress = {
+export type UserAddress = {
   street: string;
   city: string;
   state: string;

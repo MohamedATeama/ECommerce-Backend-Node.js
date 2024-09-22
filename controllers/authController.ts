@@ -8,6 +8,7 @@ import { createResetToken, createToken } from "../utils/createToken";
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import sendMail from "../utils/sendMail";
+import { rateLimit } from "express-rate-limit";
 
 export const signup = expressAsyncHandler(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -158,3 +159,9 @@ export const resetCode = expressAsyncHandler(
     res.status(200).json({ message: "your password has been changed" });
   }
 );
+
+export const authLimit = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  limit: 5,
+  message: "try again later",
+});

@@ -7,7 +7,7 @@ export const createReviewValidator: RequestHandler[] = [
   check("comment")
     .notEmpty()
     .withMessage("Review comment required")
-    .isLength({ min: 10, max: 500 })
+    .isLength({ min: 2, max: 500 })
     .withMessage("invalid comment length"),
   check("rate")
     .notEmpty()
@@ -52,7 +52,7 @@ export const updateReviewValidator: RequestHandler[] = [
     }),
   check("comment")
     .optional()
-    .isLength({ min: 10, max: 500 })
+    .isLength({ min: 2, max: 500 })
     .withMessage("invalid comment length"),
   check("rate")
     .optional()

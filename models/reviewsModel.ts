@@ -40,6 +40,12 @@ reviewsSchema.post<Reviews>("save", async function () {
   await (this.constructor as any).calcRatingAndQuantity(this.product);
 });
 
+reviewsSchema.post<Reviews>("findOneAndDelete", async function (doc: Reviews) {
+  if (doc.product) {
+    await (doc.constructor as any).calcRatingAndQuantity(doc.product);
+  }
+});
+
 reviewsSchema.pre<Reviews>(/^find/, function (next) {
   this.populate({ path: "user", select: "name image" });
   next();
