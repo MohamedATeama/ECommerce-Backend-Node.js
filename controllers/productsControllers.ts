@@ -48,6 +48,6 @@ export const resizeProductImages = expressAsyncHandler(
 
 export const getAllProducts = getAll<Products>(productsModel, "products");
 export const createProduct = createOne<Products>(productsModel);
-export const getProduct = getOne<Products>(productsModel);
+export const getProduct = getOne<Products>(productsModel, "reviews");
 export const updateProduct = updateOne<Products>(productsModel);
 export const deleteProduct = deleteOne<Products>(productsModel);

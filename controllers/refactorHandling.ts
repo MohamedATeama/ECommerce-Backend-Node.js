@@ -1,9 +1,6 @@
 import { Model } from 'mongoose';
 import expressAsyncHandler from 'express-async-handler';
-import { FilterData } from '../interfaces/filterData';
-import { Request } from 'express';
-import { Response } from 'express';
-import { NextFunction } from 'express';
+import { Request, Response, NextFunction } from "express";
 import ApiError from '../utils/apiError';
 import Features from '../utils/features';
 
@@ -32,35 +29,41 @@ export const createOne = <modelType>(model: Model<any>) =>
     res.status(201).json({ data: data });
   });
 
-export const getOne = <modelType>(model: Model<any>) =>
+export const getOne = <modelType>(
+  model: Model<any>,
+  populateOptions?: string
+) =>
   expressAsyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    const data: modelType | null = await model.findById(
-      req.params.id
-    );
-    if (!data) {
-      return (next(new ApiError("No Data Found!", 404)))
+    let query = model.findById(req.params.id);
+    if (populateOptions) {
+      query = query.populate(populateOptions);
     }
-    res.status(200).json({ data: data });
+    const document: modelType | null = await query;
+    if (!document) {
+      return next(new ApiError(("Document not found"), 404));
+    }
+    res.status(200).json({ data: document });
   });
 
 export const updateOne = <modelType>(model: Model<any>) =>
   expressAsyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    const data: modelType | null =
-      await model.findByIdAndUpdate(req.params.id, req.body, {
-        new: true,
-      });
-      if (!data) {
-        return next(new ApiError("No Data Found!", 404));
-      }
-    res.status(200).json({ data: data });
+    const document = await model.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+    });
+    if (!document) {
+      return next(new ApiError("Document not found", 404));
+    }
+    document.save();
+    res.status(200).json({ data: document });
   });
 
 export const deleteOne = <modelType>(model: Model<any>) =>
   expressAsyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    const data: modelType | null =
-      await model.findByIdAndDelete(req.params.id);
-      if (!data) {
-        return next(new ApiError("No Data Found!", 404));
-      }
+    const document: modelType | null = await model.findOneAndDelete({
+      _id: req.params.id,
+    });
+    if (!document) {
+      return next(new ApiError(("document not found"), 404));
+    }
     res.status(204).json();
   });

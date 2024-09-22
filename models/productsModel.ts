@@ -16,8 +16,14 @@ const productsSchema: Schema = new Schema<Products>(
     category: { type: Schema.Types.ObjectId, ref: "categories" },
     subCategory: { type: Schema.Types.ObjectId, ref: "subCategories" },
   },
-  { timestamps: true }
+  { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
+
+productsSchema.virtual("reviews", {
+  ref: "reviews",
+  localField: "_id",
+  foreignField: "product",
+});
 
 // const imageUrl = (document: Products) => {
 //   if (document.cover) {
